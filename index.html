@@ -1,304 +1,383 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>品教育 幸运大转盘</title>
+    <title>PIN EDU - Lucky Wheel 2025</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
+            padding: 20px;
         }
 
-        .wheel-container {
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .wheel-wrapper {
             position: relative;
-            width: 300px;
-            height: 300px;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto 30px;
+            max-width: 90vw;
+            max-height: 90vw;
         }
 
         canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
-            transform: rotate(0deg);
+            display: block;
+            width: 100%;
+            height: 100%;
         }
 
         .pointer {
             position: absolute;
-            top: -20px;
+            top: -15px;
             left: 50%;
             transform: translateX(-50%);
             width: 0;
             height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 30px solid #ff4444;
-            z-index: 2;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #ef4444;
+            z-index: 10;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
         }
 
-        #spin-button {
-            margin-top: 30px;
-            padding: 10px 30px;
-            font-size: 18px;
-            background-color: #4CAF50;
+        #spinBtn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        #spin-button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-
-        .congratulations {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            display: none;
-            z-index: 1000;
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
-        }
-
-        .firework {
-            position: fixed;
-            pointer-events: none;
-            z-index: 999;
-        }
-
-        #final-result {
-            margin-top: 20px;
-            font-size: 24px;
-            color: #333;
-            text-align: center;
-            display: none;
-        }
-
-        .pinedu-logo {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100%;
-            height: auto;
-            font-size: 42px; /* Reduced from 60px (30% smaller) */
+            padding: 15px 40px;
+            font-size: 1.2em;
             font-weight: bold;
-            color: yellow;
-            text-align: center;
-            z-index: 1;
-            text-shadow: 
-                -1px -1px 0 #000,  
-                 1px -1px 0 #000,
-                -1px  1px 0 #000,
-                 1px  1px 0 #000; /* Black border effect */
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        #spinBtn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        #spinBtn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #resultText {
+            margin-top: 25px;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .prize-info {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f3f4f6;
+            border-radius: 10px;
+        }
+
+        .prize-info h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .prize-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .prize-item {
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .wheel-wrapper {
+                width: 300px;
+                height: 300px;
+            }
+
+            #spinBtn {
+                padding: 12px 30px;
+                font-size: 1em;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="wheel-container">
-        <div class="pointer"></div>
-        <canvas id="wheelCanvas" width="300" height="300"></canvas>
-        <div class="pinedu-logo">品教育</div>
-    </div>
-    <button id="spin-button">开始抽奖</button>
-    <div id="final-result"></div>
-    <div class="congratulations" id="congratulations">
-        <h2>恭喜您!</h2>
-        <p>您抽中了 <span id="prize-amount"></span>!</p>
-        <p style="color: #ff4444;">每位家长仅限抽奖一次，感谢参与！</p>
+    <div class="container">
+        <h1>🎊 PIN EDU Lucky Wheel 🎊</h1>
+        <p class="subtitle">Chinese New Year 2025 - One Spin Per Person!</p>
+        
+        <div class="wheel-wrapper">
+            <div class="pointer"></div>
+            <canvas id="wheel" width="400" height="400"></canvas>
+        </div>
+
+        <button id="spinBtn">🎡 SPIN NOW!</button>
+        
+        <div id="resultText"></div>
+
+        <div class="prize-info">
+            <h3>🎁 Prize Pool</h3>
+            <div class="prize-list">
+                <div class="prize-item">💰 RM8</div>
+                <div class="prize-item">💰 RM18</div>
+                <div class="prize-item">💰 RM28</div>
+                <div class="prize-item">💰 RM58</div>
+                <div class="prize-item">🏆 RM88</div>
+            </div>
+            <p style="margin-top: 15px; color: #666; font-size: 0.9em;">
+                ⚠️ Each person can only spin once!
+            </p>
+        </div>
     </div>
 
     <script>
-        // The entire JavaScript remains the same as in the original file
-        const canvas = document.getElementById('wheelCanvas');
-        const ctx = canvas.getContext('2d');
-        const spinButton = document.getElementById('spin-button');
-        const finalResult = document.getElementById('final-result');
+        // =====================
+        // PIN EDU Lucky Wheel (One Spin Only)
+        // Prizes: RM8 / RM18 / RM28 / RM58 / RM88 (Very Rare)
+        // =====================
 
-        // 定义奖项及其概率权重
-        const prizes = [
-            { name: 'RM8', weight: 35 },
-            { name: 'RM28', weight: 30 },
-            { name: 'RM38', weight: 20 },
-            { name: 'RM68', weight: 10 },
-            { name: 'RM88', weight: 5 }
-        ];
+        // 1) Prizes
+        const prizes = ["RM8", "RM18", "RM28", "RM58", "RM88 🏆"];
 
-        // 检查是否已经抽过奖
-        if (localStorage.getItem('hasSpun') === 'true') {
-            const previousPrize = localStorage.getItem('prizeName');
-            spinButton.disabled = true;
-            finalResult.style.display = 'block';
-            finalResult.textContent = `您已经抽过奖了，获得了 ${previousPrize}`;
+        // 2) Weights (Total=100, RM88=2% very rare)
+        const weights = [45, 30, 15, 8, 2];
+
+        // 3) One-time restriction (same device, same browser)
+        const STORAGE_KEY = "PINEDU_CNY_WHEEL_SPUN_V2";
+        const WIN_KEY = "PINEDU_CNY_WHEEL_WIN_V2";
+
+        // DOM
+        const canvas = document.getElementById("wheel");
+        const ctx = canvas.getContext("2d");
+        const spinBtn = document.getElementById("spinBtn");
+        const resultText = document.getElementById("resultText");
+
+        const W = canvas.width, H = canvas.height;
+        const cx = W / 2, cy = H / 2;
+        const radius = Math.min(W, H) / 2 - 10;
+
+        let rotation = 0;    // Current angle (radians)
+        let spinning = false;
+
+        // Color: Each prize gets a stable color
+        function hashToColor(str) {
+            let h = 0;
+            for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+            const r = 120 + (h % 90);
+            const g = 120 + ((h >> 8) % 90);
+            const b = 120 + ((h >> 16) % 90);
+            return `rgb(${r},${g},${b})`;
         }
 
-        // 加权随机算法
-        function weightedRandom() {
-            const totalWeight = prizes.reduce((sum, prize) => sum + prize.weight, 0);
-            let random = Math.random() * totalWeight;
-            
-            for (let i = 0; i < prizes.length; i++) {
-                random -= prizes[i].weight;
-                if (random <= 0) {
-                    return i;
-                }
-            }
-            return prizes.length - 1;
-        }
-
+        // Draw wheel
         function drawWheel() {
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const radius = canvas.width / 2 - 10;
-            const anglePerPrize = (Math.PI * 2) / prizes.length;
+            ctx.clearRect(0, 0, W, H);
 
+            const n = prizes.length;
+            const arc = (Math.PI * 2) / n;
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(rotation);
+
+            for (let i = 0; i < n; i++) {
+                const start = i * arc;
+                const end = start + arc;
+
+                // Sector
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, radius, start, end);
+                ctx.closePath();
+                ctx.fillStyle = hashToColor(prizes[i]);
+                ctx.fill();
+
+                // Divider line
+                ctx.strokeStyle = "rgba(255,255,255,.75)";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Text
+                ctx.save();
+                ctx.rotate(start + arc / 2);
+                ctx.textAlign = "right";
+                ctx.fillStyle = "rgba(17,24,39,.95)";
+                ctx.font = "900 19px system-ui, sans-serif";
+                ctx.fillText(prizes[i], radius - 16, 7);
+                ctx.restore();
+            }
+
+            // Center circle
             ctx.beginPath();
-            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-            ctx.strokeStyle = '#333';
+            ctx.arc(0, 0, 58, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(17,24,39,.92)";
+            ctx.fill();
+            ctx.strokeStyle = "rgba(255,255,255,.35)";
             ctx.lineWidth = 2;
             ctx.stroke();
 
-            prizes.forEach((prize, index) => {
-                ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                const startAngle = (index * anglePerPrize) - Math.PI / 2 - (anglePerPrize / 2);
-                ctx.arc(centerX, centerY, radius, startAngle, startAngle + anglePerPrize);
-                ctx.closePath();
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            ctx.font = "900 14px system-ui, sans-serif";
+            ctx.fillText("PIN EDU", 0, -4);
+            ctx.font = "700 12px system-ui, sans-serif";
+            ctx.fillText("One Spin Only", 0, 16);
 
-                const gradient = ctx.createRadialGradient(
-                    centerX, centerY, 0,
-                    centerX, centerY, radius
-                );
-                const hue = index * (360 / prizes.length);
-                gradient.addColorStop(0, `hsl(${hue}, 70%, 60%)`);
-                gradient.addColorStop(1, `hsl(${hue}, 70%, 45%)`);
-                
-                ctx.fillStyle = gradient;
-                ctx.fill();
-                ctx.stroke();
-
-                ctx.save();
-                ctx.translate(centerX, centerY);
-                ctx.rotate(startAngle + anglePerPrize / 2);
-                ctx.textAlign = 'right';
-                ctx.fillStyle = 'white';
-                ctx.font = 'bold 16px Arial';
-                ctx.fillText(prize.name, radius - 20, 6);
-                ctx.restore();
-            });
-
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, 20, 0, Math.PI * 2);
-            ctx.fillStyle = '#fff';
-            ctx.fill();
-            ctx.stroke();
+            ctx.restore();
         }
 
-        function createFirework(x, y) {
-            const firework = document.createElement('div');
-            firework.className = 'firework';
-            firework.style.left = x + 'px';
-            firework.style.top = y + 'px';
-            document.body.appendChild(firework);
-
-            for (let i = 0; i < 30; i++) {
-                const particle = document.createElement('div');
-                particle.style.position = 'absolute';
-                particle.style.width = '4px';
-                particle.style.height = '4px';
-                particle.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
-                particle.style.borderRadius = '50%';
-                firework.appendChild(particle);
-
-                const angle = Math.random() * Math.PI * 2;
-                const velocity = 2 + Math.random() * 3;
-                const dx = Math.cos(angle) * velocity;
-                const dy = Math.sin(angle) * velocity;
-                let x = 0;
-                let y = 0;
-                let opacity = 1;
-
-                const animate = () => {
-                    if (opacity <= 0) {
-                        firework.remove();
-                        return;
-                    }
-                    x += dx;
-                    y += dy;
-                    opacity -= 0.02;
-                    particle.style.transform = `translate(${x}px, ${y}px)`;
-                    particle.style.opacity = opacity;
-                    requestAnimationFrame(animate);
-                };
-                animate();
+        // Weighted random selection
+        function pickIndexByWeight(ws) {
+            const total = ws.reduce((a, b) => a + b, 0);
+            let r = Math.random() * total;
+            for (let i = 0; i < ws.length; i++) {
+                r -= ws[i];
+                if (r <= 0) return i;
             }
+            return ws.length - 1;
         }
 
-        function showCongratulations(prize) {
-            const congrats = document.getElementById('congratulations');
-            document.getElementById('prize-amount').textContent = prize;
-            congrats.style.display = 'block';
-            
-            finalResult.style.display = 'block';
-            finalResult.textContent = `您抽中了 ${prize}`;
-            
-            // 保存抽奖结果
-            localStorage.setItem('hasSpun', 'true');
-            localStorage.setItem('prizeName', prize);
-            
-            if (prize === 'RM88') {
-                for (let i = 0; i < 5; i++) {
-                    setTimeout(() => {
-                        const x = Math.random() * window.innerWidth;
-                        const y = Math.random() * window.innerHeight;
-                        createFirework(x, y);
-                    }, i * 300);
+        // Calculate rotation to target sector (pointer at 12 o'clock)
+        function angleToIndex(index) {
+            const n = prizes.length;
+            const arc = (Math.PI * 2) / n;
+            const centerAngle = index * arc + arc / 2;
+            const pointerAngle = -Math.PI / 2;
+            let targetRotation = pointerAngle - centerAngle;
+            targetRotation = ((targetRotation % (Math.PI * 2)) + (Math.PI * 2)) % (Math.PI * 2);
+            return targetRotation;
+        }
+
+        // Lock: Once spun, can't spin again
+        function lockUIWithPrize(prize) {
+            spinBtn.disabled = true;
+            resultText.textContent = `✅ You've already spun: 🎉 ${prize}`;
+        }
+
+        // Spin animation
+        function spin() {
+            if (spinning) return;
+
+            // Already spun - lock immediately
+            if (localStorage.getItem(STORAGE_KEY) === "1") {
+                const savedPrize = localStorage.getItem(WIN_KEY) || "(Already spun)";
+                lockUIWithPrize(savedPrize);
+                return;
+            }
+
+            spinning = true;
+            spinBtn.disabled = true;
+            resultText.textContent = "Spinning… 🎡";
+
+            const winnerIndex = pickIndexByWeight(weights);
+            const target = angleToIndex(winnerIndex);
+
+            const extraSpins = 7 + Math.floor(Math.random() * 2); // 7-8 full rotations
+            const finalRotation = target + extraSpins * Math.PI * 2;
+
+            const startRotation = rotation;
+            const delta = finalRotation - startRotation;
+
+            const duration = 4200;
+            const start = performance.now();
+
+            function easeOutCubic(t) {
+                return 1 - Math.pow(1 - t, 3);
+            }
+
+            function animate(now) {
+                const t = Math.min(1, (now - start) / duration);
+                rotation = startRotation + delta * easeOutCubic(t);
+                drawWheel();
+
+                if (t < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    spinning = false;
+
+                    // Normalize
+                    rotation = ((rotation % (Math.PI * 2)) + (Math.PI * 2)) % (Math.PI * 2);
+                    drawWheel();
+
+                    const prize = prizes[winnerIndex];
+
+                    // Save to localStorage: lock to one spin only
+                    localStorage.setItem(STORAGE_KEY, "1");
+                    localStorage.setItem(WIN_KEY, prize);
+
+                    lockUIWithPrize(prize);
                 }
             }
 
-            setTimeout(() => {
-                congrats.style.display = 'none';
-            }, 3000);
-
-            // 禁用按钮并移除点击事件
-            spinButton.disabled = true;
-            spinButton.removeEventListener('click', spinWheel);
+            requestAnimationFrame(animate);
         }
 
-        function spinWheel() {
-            // 禁用按钮防止重复点击
-            spinButton.disabled = true;
+        // Initialize: If already spun, lock on page load
+        function initOnceOnly() {
+            drawWheel();
 
-            // 使用加权随机算法选择奖项
-            const selectedIndex = weightedRandom();
-            const rotations = 5;
-            const sectionAngle = 360 / prizes.length;
-            const targetAngle = -(rotations * 360 + (selectedIndex * sectionAngle));
-            
-            canvas.style.transform = `rotate(${targetAngle}deg)`;
-
-            setTimeout(() => {
-                showCongratulations(prizes[selectedIndex].name);
-            }, 4000);
+            if (localStorage.getItem(STORAGE_KEY) === "1") {
+                const savedPrize = localStorage.getItem(WIN_KEY) || "(Already spun)";
+                lockUIWithPrize(savedPrize);
+            }
         }
 
-        // 初始化
-        drawWheel();
-        spinButton.addEventListener('click', spinWheel);
+        spinBtn.addEventListener("click", spin);
+        initOnceOnly();
     </script>
 </body>
 </html>
